@@ -15,8 +15,8 @@
 namespace Hyn\Tenancy\Website;
 
 use Hyn\Tenancy\Contracts\Tenant;
-use Hyn\Tenancy\Environment;
 use Hyn\Tenancy\Contracts\Website;
+use Hyn\Tenancy\Environment;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\Filesystem as LocalSystem;
@@ -78,7 +78,7 @@ class Directory implements Filesystem
      * @param bool $local
      * @return string
      */
-    public function path(string $path = null, $local = false): string
+    public function path($path): string
     {
         $prefix = "{$this->getWebsite()->uuid}/";
 
@@ -90,7 +90,7 @@ class Directory implements Filesystem
             $path = "$prefix$path";
         }
 
-        if ($local && $this->isLocal()) {
+        if ($this->isLocal()) {
             $config = $this->filesystem->getConfig();
             $path = sprintf(
                 "%s/%s",
@@ -100,6 +100,16 @@ class Directory implements Filesystem
         }
 
         return $path;
+    }
+
+    public function putFile($path, $file = null, $options = [])
+    {
+        // tba
+    }
+
+    public function putFileAs($path, $file, $name = null, $options = [])
+    {
+        // tba
     }
 
     /**
