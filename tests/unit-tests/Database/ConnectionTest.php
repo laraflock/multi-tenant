@@ -14,7 +14,6 @@
 
 namespace Hyn\Tenancy\Tests\Database;
 
-use Doctrine\DBAL\Driver\PDOException;
 use Hyn\Tenancy\Commands\UpdateKeyCommand;
 use Hyn\Tenancy\Contracts\CurrentHostname;
 use Hyn\Tenancy\Environment;
@@ -23,6 +22,7 @@ use Hyn\Tenancy\Tests\Extend\NonExtend;
 use Hyn\Tenancy\Tests\Test;
 use Illuminate\Database\Connection as DatabaseConnection;
 use Illuminate\Support\Str;
+use PDOException;
 
 class ConnectionTest extends Test
 {
@@ -135,16 +135,23 @@ class ConnectionTest extends Test
 
         // Re-establish connection and expect 1045 error code (Access denied for user)
         app(Environment::class)->tenant($this->website);
+
+        $hasCaughtException = false;
         try {
             $this->connection->get()->reconnect();
+            $this->connection->get()->getPdo();
         } catch (PDOException $e) {
             $this->assertTrue($e->getCode() === 1045 || $e->getCode() === 7, 'Access should be denied for tenant database user: [code: '.$e->getCode().'] '. $e->getMessage());
+            $hasCaughtException = true;
         }
+
+        $this->assertTrue($hasCaughtException, 'Access should be denied for tenant database user.');
 
         $this->artisan(UpdateKeyCommand::class);
 
         // Re-establish connection after updating tenant users password
         app(Environment::class)->tenant($this->website);
         $this->connection->get()->reconnect();
+        $this->connection->get()->getPdo();
     }
 }

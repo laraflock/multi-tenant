@@ -75,10 +75,9 @@ class Directory implements Filesystem
 
     /**
      * @param string $path
-     * @param bool $local
      * @return string
      */
-    public function path(string $path = null, $local = false): string
+    public function path($path = null): string
     {
         $prefix = "{$this->getWebsite()->uuid}/";
 
@@ -90,7 +89,18 @@ class Directory implements Filesystem
             $path = "$prefix$path";
         }
 
-        if ($local && $this->isLocal()) {
+        return $path;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function localPath(string $path = null): string
+    {
+        $path = $this->path($path);
+
+        if ($this->isLocal()) {
             $config = $this->filesystem->getConfig();
             $path = sprintf(
                 "%s/%s",
@@ -100,6 +110,25 @@ class Directory implements Filesystem
         }
 
         return $path;
+    }
+
+    public function putFile($path, $file = null, $options = [])
+    {
+        return $this->filesystem->putFile(
+            $this->path($path),
+            $file,
+            $options
+        );
+    }
+
+    public function putFileAs($path, $file, $name = null, $options = [])
+    {
+        return $this->filesystem->putFileAs(
+            $this->path($path),
+            $file,
+            $name,
+            $options
+        );
     }
 
     /**
@@ -367,7 +396,7 @@ class Directory implements Filesystem
     public function __call($name, $arguments)
     {
         if ($this->isLocal() && method_exists($this->local, $name)) {
-            $arguments[0] = $this->path($arguments[0], true);
+            $arguments[0] = $this->localPath($arguments[0]);
 
             return call_user_func_array([$this->local, $name], $arguments);
         }
