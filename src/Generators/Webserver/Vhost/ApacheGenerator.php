@@ -39,7 +39,7 @@ class ApacheGenerator implements VhostGenerator, ReloadsServices
     public function media(Website $website)
     {
         return $this->directory->setWebsite($website)->isLocal() && $this->directory->exists('media') ?
-            $this->directory->path('media', true) :
+            $this->directory->localPath('media') :
             null;
     }
 

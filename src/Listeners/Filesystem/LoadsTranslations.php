@@ -40,7 +40,7 @@ class LoadsTranslations extends AbstractTenantDirectoryListener
     public function load(WebsiteEvent $event)
     {
         if ($this->directory()->isLocal()) {
-            $this->readLanguageFiles($this->directory()->path($this->path, true));
+            $this->readLanguageFiles($this->directory()->localPath($this->path));
         } else {
             throw new FilesystemException("$this->path is not available locally, cannot include");
         }

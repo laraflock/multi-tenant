@@ -83,6 +83,10 @@ class Environment
 
             return $hostname;
         });
+
+        if ($this->app->resolved(CurrentHostname::class)) {
+            $this->app->make(CurrentHostname::class);
+        }
     }
 
     /**
